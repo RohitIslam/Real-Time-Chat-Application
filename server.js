@@ -14,8 +14,22 @@ const publicDirectoryPath = path.join(__dirname, "/public");
 // Setup public directory to serve
 app.use(express.static(publicDirectoryPath));
 
-io.on("connection", () => {
+// server (emit event) -> client (recieve) - countUpdated
+// client (emit event) -> server (recieve) - increment
+
+let count = 0;
+
+// Server side connection
+
+io.on("connection", socket => {
   console.log("Websocket connected");
+
+  socket.emit("countUpdated", count);
+
+  socket.on("increment", () => {
+    count++;
+    io.emit("countUpdated", count);
+  });
 });
 
 // Start server at PORT 5000
