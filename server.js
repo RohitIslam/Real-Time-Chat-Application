@@ -14,21 +14,17 @@ const publicDirectoryPath = path.join(__dirname, "/public");
 // Setup public directory to serve
 app.use(express.static(publicDirectoryPath));
 
-// server (emit event) -> client (recieve) - countUpdated
-// client (emit event) -> server (recieve) - increment
-
-let count = 0;
-
 // Server side connection
 
 io.on("connection", socket => {
   console.log("Websocket connected");
 
-  socket.emit("countUpdated", count);
+  socket.emit("message", "Welcome!"); // emiting 'message' event from server and sending "Welcome!" to clients
 
-  socket.on("increment", () => {
-    count++;
-    io.emit("countUpdated", count);
+  //listening to 'sendMessage' call from server
+  socket.on("sendMessage", clientMessage => {
+    console.log(clientMessage);
+    io.emit("message", clientMessage); // emiting 'message' event from server and sending 'clientMessage' data to clients
   });
 });
 
