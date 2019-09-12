@@ -9,7 +9,10 @@ document.querySelector("form").addEventListener("submit", event => {
 
   const clientMessage = event.target.elements.inputMessage.value;
 
-  socket.emit("sendMessage", clientMessage); // emiting 'sendMessage' event from client and sending 'clientMessage' data to server
+  // emiting 'sendMessage' event from client and sending 'clientMessage' data to server
+  socket.emit("sendMessage", clientMessage, () => {
+    console.log("msg delivered");
+  });
 });
 
 // Getting user's location from browser

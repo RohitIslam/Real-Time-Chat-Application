@@ -24,8 +24,10 @@ io.on("connection", socket => {
   socket.broadcast.emit("message", "A new user has joined");
 
   //listening to 'sendMessage' call from server
-  socket.on("sendMessage", clientMessage => {
-    io.emit("message", clientMessage); // emiting 'message' event from server and sending 'clientMessage' data to all clients
+  socket.on("sendMessage", (clientMessage, callback) => {
+    // emiting 'message' event from server and sending 'clientMessage' data to all clients
+    io.emit("message", clientMessage);
+    callback();
   });
 
   socket.on("sendLocation", location => {
