@@ -10,7 +10,11 @@ document.querySelector("form").addEventListener("submit", event => {
   const clientMessage = event.target.elements.inputMessage.value;
 
   // emiting 'sendMessage' event from client and sending 'clientMessage' data to server
-  socket.emit("sendMessage", clientMessage, () => {
+  // 3rd argument in the soket.emit function is a callback function which is for event acknowledgement
+  socket.emit("sendMessage", clientMessage, error => {
+    if (error) {
+      return console.log(error);
+    }
     console.log("msg delivered");
   });
 });
@@ -26,7 +30,8 @@ document.querySelector("#send-location").addEventListener("click", () => {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude
     };
-    console.log(location);
-    socket.emit("sendLocation", location);
+    socket.emit("sendLocation", location, () => {
+      console.log("Location Shared!");
+    });
   });
 });

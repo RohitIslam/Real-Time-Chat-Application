@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const http = require("http");
 const socketio = require("socket.io");
+const Filter = require("bad-words");
 
 // Configuring server
 const app = express();
@@ -25,16 +26,23 @@ io.on("connection", socket => {
 
   //listening to 'sendMessage' call from server
   socket.on("sendMessage", (clientMessage, callback) => {
+    const filterWords = new Filter();
+
+    if (filterWords.isProfane(clientMessage)) {
+      return callback("Profanity in not allowed");
+    }
+
     // emiting 'message' event from server and sending 'clientMessage' data to all clients
     io.emit("message", clientMessage);
-    callback();
+    callback(); // get event acknowledgement
   });
 
-  socket.on("sendLocation", location => {
+  socket.on("sendLocation", (location, callback) => {
     io.emit(
       "message",
       `Location: https://google.com/maps?q=${location.latitude},${location.longitude}`
     );
+    callback();
   });
 
   // Emting a 'disconnect' event when an user get disconnected
