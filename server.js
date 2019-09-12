@@ -3,6 +3,7 @@ const path = require("path");
 const http = require("http");
 const socketio = require("socket.io");
 const Filter = require("bad-words");
+const { generateMessage } = require("./utils/messages");
 
 // Configuring server
 const app = express();
@@ -20,9 +21,9 @@ app.use(express.static(publicDirectoryPath));
 io.on("connection", socket => {
   console.log("Websocket connected");
 
-  socket.emit("message", "Welcome!"); // emiting 'message' event from server and sending "Welcome!" to clients
+  socket.emit("message", generateMessage("Welcome!")); // emiting 'message' event from server and sending "Welcome!" to clients
 
-  socket.broadcast.emit("message", "A new user has joined");
+  socket.broadcast.emit("message", generateMessage("A new user has joined"));
 
   //listening to 'sendMessage' call from server
   socket.on("sendMessage", (clientMessage, callback) => {
@@ -33,7 +34,7 @@ io.on("connection", socket => {
     }
 
     // emiting 'message' event from server and sending 'clientMessage' data to all clients
-    io.emit("message", clientMessage);
+    io.emit("message", generateMessage(clientMessage));
     callback(); // get event acknowledgement
   });
 
@@ -47,7 +48,7 @@ io.on("connection", socket => {
 
   // Emting a 'disconnect' event when an user get disconnected
   socket.on("disconnect", () => {
-    io.emit("message", "A user has left");
+    io.emit("message", generateMessage("A user has left"));
   });
 });
 

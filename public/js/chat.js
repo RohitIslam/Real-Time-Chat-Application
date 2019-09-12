@@ -16,7 +16,10 @@ const locationTemplate = document.querySelector("#location-template").innerHTML;
 
 //listening to 'message' call from client
 socket.on("message", msg => {
-  const html = Mustache.render(messageTemplate, { userMessage: msg });
+  const html = Mustache.render(messageTemplate, {
+    userMessage: msg.text,
+    createdAt: moment(msg.createdAt).format("h:mm a") // h == hour, m == minutes, a == am/pm
+  });
   $messages.insertAdjacentHTML("beforeend", html);
 });
 
