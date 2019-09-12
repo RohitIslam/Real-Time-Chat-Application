@@ -13,6 +13,12 @@ const $messages = document.querySelector("#messages");
 const messageTemplate = document.querySelector("#message-template").innerHTML;
 const locationTemplate = document.querySelector("#location-template").innerHTML;
 
+// Options
+// QS library used for parsing query string from browser url and destructuring username and room
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true
+});
+
 //listening to 'message' call from client
 socket.on("message", msg => {
   const html = Mustache.render(messageTemplate, {
@@ -70,3 +76,5 @@ $sendLocationButton.addEventListener("click", () => {
     });
   });
 });
+
+socket.emit("joinRoom", { username, room });
