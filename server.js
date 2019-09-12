@@ -21,10 +21,16 @@ io.on("connection", socket => {
 
   socket.emit("message", "Welcome!"); // emiting 'message' event from server and sending "Welcome!" to clients
 
+  socket.broadcast.emit("message", "A new user has joined");
+
   //listening to 'sendMessage' call from server
   socket.on("sendMessage", clientMessage => {
-    console.log(clientMessage);
     io.emit("message", clientMessage); // emiting 'message' event from server and sending 'clientMessage' data to clients
+  });
+
+  // Emting a 'disconnect' event when an user get disconnected
+  socket.on("disconnect", () => {
+    io.emit("message", "A user has left");
   });
 });
 
