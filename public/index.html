@@ -7,6 +7,7 @@
     <h1>Basic Chat Application</h1>
 
     <div id="messages"></div>
+    <div id="locations"></div>
 
     <form>
       <input type="text" name="inputMessage" placeholder="type messages...." />
@@ -18,6 +19,11 @@
     <script id="message-template" type="text/html">
       <div>
         <p>{{userMessage}}</p>
+      </div>
+    </script>
+    <script id="location-template" type="text/html">
+      <div>
+        <a href={{userLocation}} target="_blank"> My Location</a>
       </div>
     </script>
 
