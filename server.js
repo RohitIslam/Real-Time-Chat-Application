@@ -25,7 +25,14 @@ io.on("connection", socket => {
 
   //listening to 'sendMessage' call from server
   socket.on("sendMessage", clientMessage => {
-    io.emit("message", clientMessage); // emiting 'message' event from server and sending 'clientMessage' data to clients
+    io.emit("message", clientMessage); // emiting 'message' event from server and sending 'clientMessage' data to all clients
+  });
+
+  socket.on("sendLocation", location => {
+    io.emit(
+      "message",
+      `Location: https://google.com/maps?q=${location.latitude},${location.longitude}`
+    );
   });
 
   // Emting a 'disconnect' event when an user get disconnected
