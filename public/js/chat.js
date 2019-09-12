@@ -8,7 +8,6 @@ const $messageFormInput = document.querySelector("input");
 const $messageFormButton = document.querySelector("button");
 const $sendLocationButton = document.querySelector("#send-location");
 const $messages = document.querySelector("#messages");
-const $locations = document.querySelector("#locations");
 
 // Templates
 const messageTemplate = document.querySelector("#message-template").innerHTML;
@@ -28,7 +27,7 @@ socket.on("locationMessage", locationUrl => {
     userLocation: locationUrl.url,
     createdAt: moment(locationUrl.createdAt).format("h:mm a")
   });
-  $locations.insertAdjacentHTML("beforeend", locationLink);
+  $messages.insertAdjacentHTML("beforeend", locationLink);
 });
 
 $messageForm.addEventListener("submit", event => {
