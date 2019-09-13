@@ -8,6 +8,13 @@ const {
   generateLocationMessage
 } = require("./utils/messages");
 
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom
+} = require("./utils/users");
+
 // Configuring server
 const app = express();
 const server = http.createServer(app);
@@ -25,14 +32,22 @@ io.on("connection", socket => {
   console.log("Websocket connected");
 
   //listening to 'joinRoom' call from server
-  socket.on("joinRoom", ({ username, room }) => {
+  socket.on("joinRoom", ({ username, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, username, room });
+
+    if (error) {
+      return callback(error);
+    }
+
     socket.join(room);
 
-    socket.emit("message", generateMessage("Welcome!")); // emiting 'message' event from server and sending "Welcome!" to the client
+    socket.emit("message", generateMessage("Welcome!"), callback); // emiting 'message' event from server and sending "Welcome!" to the client
 
     socket.broadcast
       .to(room)
-      .emit("message", generateMessage(`${username} has joined!`));
+      .emit("message", generateMessage(`${user.username} has joined!`));
+
+    callback();
   });
 
   //listening to 'sendMessage' call from server
@@ -60,7 +75,14 @@ io.on("connection", socket => {
 
   // Emting a 'disconnect' event when an user get disconnected
   socket.on("disconnect", () => {
-    io.emit("message", generateMessage("A user has left"));
+    const user = removeUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        generateMessage(`${user.username} has left`)
+      );
+    }
   });
 });
 
