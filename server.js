@@ -41,36 +41,51 @@ io.on("connection", socket => {
 
     socket.join(room);
 
-    socket.emit("message", generateMessage("Welcome!"), callback); // emiting 'message' event from server and sending "Welcome!" to the client
+    socket.emit("message", generateMessage("Admin", "Welcome!"), callback); // emiting 'message' event from server and sending "Welcome!" to the client
 
     socket.broadcast
       .to(room)
-      .emit("message", generateMessage(`${user.username} has joined!`));
+      .emit(
+        "message",
+        generateMessage("Admin", `${user.username} has joined!`)
+      );
 
     callback();
   });
 
   //listening to 'sendMessage' call from server
   socket.on("sendMessage", (clientMessage, callback) => {
-    const filterWords = new Filter();
+    const user = getUser(socket.id);
 
-    if (filterWords.isProfane(clientMessage)) {
-      return callback("Profanity in not allowed");
+    if (user) {
+      const filterWords = new Filter();
+
+      if (filterWords.isProfane(clientMessage)) {
+        return callback("Profanity in not allowed");
+      }
+
+      // emiting 'message' event from server and sending 'clientMessage' data to all clients
+      io.to(user.room).emit(
+        "message",
+        generateMessage(user.username, clientMessage)
+      );
+      callback(); // get event acknowledgement
     }
-
-    // emiting 'message' event from server and sending 'clientMessage' data to all clients
-    io.emit("message", generateMessage(clientMessage));
-    callback(); // get event acknowledgement
   });
 
   socket.on("sendLocation", (location, callback) => {
-    io.emit(
-      "locationMessage",
-      generateLocationMessage(
-        `https://google.com/maps?q=${location.latitude},${location.longitude}`
-      )
-    );
-    callback();
+    const user = getUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        "locationMessage",
+        generateLocationMessage(
+          user.username,
+          `https://google.com/maps?q=${location.latitude},${location.longitude}`
+        )
+      );
+      callback();
+    }
   });
 
   // Emting a 'disconnect' event when an user get disconnected
@@ -80,7 +95,7 @@ io.on("connection", socket => {
     if (user) {
       io.to(user.room).emit(
         "message",
-        generateMessage(`${user.username} has left`)
+        generateMessage("Admin", `${user.username} has left`)
       );
     }
   });
