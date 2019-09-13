@@ -20,6 +20,33 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true
 });
 
+// AUTO-SCROLL
+
+const autoscroll = () => {
+  // [Step - 1] Getting new message element
+  const $newMessage = $messages.lastElementChild;
+
+  // [Step - 2] Getting the height of the new message
+  const newMessageStyles = getComputedStyle($newMessage); // getting styles for a new message from Style.css
+  const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+  const newMessageHeight = $newMessage.offsetHeight + newMessageMargin; //offsetHeight === height without margin
+
+  // [Step - 3] Getting the visible height
+  const visibleHeight = $messages.offsetHeight;
+
+  // [Step - 4] Getting the messages container height
+  const containerHeight = $messages.scrollHeight; // scrollHeight gives us the total height we are able to scroll through
+
+  // [Step - 5] Getting the value of how far down I have scrolled
+  const scrollOffset = $messages.scrollTop + visibleHeight; // scrollTop gives us as a number the amount of distance we have scrolled from the top
+
+  // [Final Step] making sure that users were indeed at the bottom before the new message was added
+  if (containerHeight - newMessageHeight <= scrollOffset) {
+    // pushing scroller at the bottom
+    $messages.scrollTop = $messages.scrollHeight;
+  }
+};
+
 //listening to 'message' call from client
 socket.on("message", msg => {
   const html = Mustache.render(messageTemplate, {
@@ -28,6 +55,7 @@ socket.on("message", msg => {
     createdAt: moment(msg.createdAt).format("h:mm a") // h == hour, m == minutes, a == am/pm
   });
   $messages.insertAdjacentHTML("beforeend", html);
+  autoscroll();
 });
 
 socket.on("locationMessage", locationMsg => {
@@ -37,6 +65,7 @@ socket.on("locationMessage", locationMsg => {
     createdAt: moment(locationMsg.createdAt).format("h:mm a")
   });
   $messages.insertAdjacentHTML("beforeend", html);
+  autoscroll();
 });
 
 socket.on("roomData", ({ room, users }) => {
