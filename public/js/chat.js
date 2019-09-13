@@ -12,6 +12,7 @@ const $messages = document.querySelector("#messages");
 // Templates
 const messageTemplate = document.querySelector("#message-template").innerHTML;
 const locationTemplate = document.querySelector("#location-template").innerHTML;
+const sidebarTemplate = document.querySelector("#sidebar-template").innerHTML;
 
 // Options
 // QS library used for parsing query string from browser url and destructuring username and room
@@ -30,12 +31,21 @@ socket.on("message", msg => {
 });
 
 socket.on("locationMessage", locationMsg => {
-  const locationLink = Mustache.render(locationTemplate, {
+  const html = Mustache.render(locationTemplate, {
     username: locationMsg.username,
     userLocation: locationMsg.url,
     createdAt: moment(locationMsg.createdAt).format("h:mm a")
   });
-  $messages.insertAdjacentHTML("beforeend", locationLink);
+  $messages.insertAdjacentHTML("beforeend", html);
+});
+
+socket.on("roomData", ({ room, users }) => {
+  const html = Mustache.render(sidebarTemplate, {
+    room,
+    users
+  });
+
+  document.querySelector("#sidebar").innerHTML = html;
 });
 
 $messageForm.addEventListener("submit", event => {
