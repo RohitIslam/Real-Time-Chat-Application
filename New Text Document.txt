@@ -1,0 +1,12 @@
+Git test:
+
+git clone https://github.com/your-username/sample-repo.git
+cd sample-repo
+git checkout -b feature/test-branch
+
+
+git add .
+git commit -m "Added test.txt file"
+
+
+git push origin feature/test-branch
